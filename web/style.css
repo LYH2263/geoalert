@@ -1,0 +1,58 @@
+:root {
+  --bg: #0f1419;
+  --fg: #e8eef4;
+  --muted: #8aa0b2;
+  --accent: #3d9a7a;
+  --panel: #1a222c;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "PingFang SC", sans-serif;
+  background: linear-gradient(160deg, #0f1419 0%, #1a2a28 50%, #132028 100%);
+  color: var(--fg);
+  min-height: 100vh;
+}
+header {
+  padding: 1.5rem 2rem 0.5rem;
+  border-bottom: 1px solid #2a3540;
+}
+h1 { margin: 0; font-weight: 650; letter-spacing: 0.02em; }
+.sub { color: var(--muted); margin: 0.4rem 0 0; }
+main {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.5rem 2rem 3rem;
+  max-width: 960px;
+}
+section {
+  background: var(--panel);
+  padding: 1rem 1.25rem;
+  border-radius: 4px;
+}
+h2 { margin: 0 0 0.75rem; font-size: 1.05rem; color: var(--accent); }
+pre {
+  background: #0c1015;
+  padding: 0.75rem;
+  overflow: auto;
+  font-size: 0.85rem;
+  border-radius: 3px;
+}
+label { display: inline-block; margin: 0.35rem 0.75rem 0.35rem 0; font-size: 0.9rem; }
+input {
+  background: #0c1015;
+  border: 1px solid #33404d;
+  color: var(--fg);
+  padding: 0.35rem 0.5rem;
+  margin-left: 0.35rem;
+}
+button {
+  background: var(--accent);
+  color: #04140f;
+  border: 0;
+  padding: 0.45rem 0.9rem;
+  margin: 0.5rem 0.5rem 0 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+#msg { color: var(--muted); min-height: 1.2em; }
