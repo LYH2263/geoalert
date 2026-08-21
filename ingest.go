@@ -45,14 +45,20 @@ func (e *Engine) IngestContext(ctx context.Context, p TrackPoint) error {
 }
 
 // IngestBatch 批量摄入；每点之间检查 ctx。
+// 透传调用方 ctx，使逐点循环认 ctx.Done：请求取消后下一次 IngestContext 入口即短路返回 ErrCanceled，
+// 不会继续啃剩余坐标点。
 func (e *Engine) IngestBatch(ctx context.Context, points []TrackPoint) error {
 	if e.closed.Load() {
 		return ErrClosed
 	}
-
-	_ = ctx
+	if err := ctx.Err(); err != nil {
+		return ErrCanceled
+	}
 	for i := range points {
-		if err := e.IngestContext(context.Background(), points[i]); err != nil {
+		if err := ctx.Err(); err != nil {
+			return ErrCanceled
+		}
+		if err := e.IngestContext(ctx, points[i]); err != nil {
 			return err
 		}
 	}
@@ -60,8 +66,6 @@ func (e *Engine) IngestBatch(ctx context.Context, points []TrackPoint) error {
 }
 
 func (e *Engine) ingestLocked(ctx context.Context, p TrackPoint) error {
-
-	_ = ctx
 	t := e.ensureTrackLocked(p.ObjectID)
 	e.appendPointLocked(t, p)
 	e.ingests.Add(1)
