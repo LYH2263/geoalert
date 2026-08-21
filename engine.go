@@ -107,11 +107,12 @@ func (e *Engine) RegisterFence(f Fence) error {
 		return ErrExists
 	}
 
-	e.fences[norm.ID] = norm
-	e.active[norm.ID] = true
+	// 先持久化，成功后才写入内存并标记 active，避免持久化失败留下半残 active 表项。
 	if err := e.store.SaveFence(toPersistFence(norm)); err != nil {
 		return wrapPersist(err)
 	}
+	e.fences[norm.ID] = norm
+	e.active[norm.ID] = true
 	e.metrics.IncFences(1)
 	if e.auditor != nil {
 		_ = e.auditor.Write("register", norm.ID, norm.Kind.String())

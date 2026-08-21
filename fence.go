@@ -15,7 +15,9 @@ func normalizeFence(f Fence) (Fence, error) {
 	out.Tags = clone.Strings(f.Tags)
 	switch f.Kind {
 	case FencePolygon:
-
+		if err := validatePolygon(f.Vertices); err != nil {
+			return Fence{}, wrapInvalidFence(err)
+		}
 		verts := cloneLatLngs(f.Vertices)
 		out.Vertices = verts
 		out.Center = LatLng{}
@@ -38,6 +40,21 @@ func normalizeFence(f Fence) (Fence, error) {
 		out.AlertOnExit = true
 	}
 	return out, nil
+}
+
+// validatePolygon 校验多边形顶点：必须非空且过 CheckPolygon 的几何/坐标校验。
+// 运营常误传空 Vertices 切片，此处显式拒收，避免空围栏进入 active 表。
+func validatePolygon(verts []LatLng) error {
+	if len(verts) == 0 {
+		return validate.ErrTooFewVertices
+	}
+	lats := make([]float64, len(verts))
+	lngs := make([]float64, len(verts))
+	for i, v := range verts {
+		lats[i] = v.Lat
+		lngs[i] = v.Lng
+	}
+	return validate.CheckPolygon(lats, lngs)
 }
 
 func cloneLatLngs(src []LatLng) []LatLng {
