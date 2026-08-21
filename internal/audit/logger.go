@@ -75,17 +75,32 @@ func (l *Logger) SetMaxBytes(n int64) {
 	l.maxRot = n
 }
 
-// rotateLocked 轮转：关闭旧文件再打开新文件。
+// rotateLocked 轮转：先 Sync/Close 旧句柄再 Rename，最后打开新文件。
+// Windows 下若不先关闭占用句柄，Rename 会因文件被占用而失败，
+// 导致轮转文件出不来。
 func (l *Logger) rotateLocked() error {
 	if l.f == nil {
 		return nil
 	}
 
+	// 先刷盘再关闭旧句柄，释放对 path 的占用，
+	// 这样 Windows 上的 Rename 才不会报文件占用。
 	_ = l.f.Sync()
-	rotated := fmt.Sprintf("%s.%d", l.path, time.Now().Unix())
-	if err := os.Rename(l.path, rotated); err != nil {
+	old := l.f
+	l.f = nil
+	if err := old.Close(); err != nil {
 		return err
 	}
+
+	rotated := fmt.Sprintf("%s.%d", l.path, time.Now().Unix())
+	if err := os.Rename(l.path, rotated); err != nil {
+		// Rename 失败时回退：重新打开原文件，保持 Logger 可用。
+		if f, ferr := os.OpenFile(l.path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644); ferr == nil {
+			l.f = f
+		}
+		return err
+	}
+
 	f, err := os.OpenFile(l.path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
 	if err != nil {
 		return err
