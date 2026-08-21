@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>geoalert 管理页</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <h1>地理围栏告警</h1>
+    <p class="sub">geod · 注册围栏 / 注入轨迹 / 查看告警</p>
+  </header>
+  <main>
+    <section>
+      <h2>状态</h2>
+      <pre id="stats">加载中…</pre>
+    </section>
+    <section>
+      <h2>围栏</h2>
+      <pre id="fences">[]</pre>
+      <label>ID <input id="fid" value="yard" /></label>
+      <label>名称 <input id="fname" value="院子" /></label>
+      <label>顶点 JSON <input id="verts" style="width:28rem" value='[{"lat":31.23,"lng":121.47},{"lat":31.23,"lng":121.48},{"lat":31.22,"lng":121.48},{"lat":31.22,"lng":121.47}]' /></label>
+      <button id="reg">注册多边形</button>
+    </section>
+    <section>
+      <h2>注入点</h2>
+      <label>对象 <input id="oid" value="truck-1" /></label>
+      <label>Lat <input id="lat" value="31.225" /></label>
+      <label>Lng <input id="lng" value="121.475" /></label>
+      <button id="ingest">注入</button>
+      <p id="msg"></p>
+    </section>
+    <section>
+      <h2>告警</h2>
+      <pre id="alerts">[]</pre>
+      <button id="refresh">刷新</button>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
