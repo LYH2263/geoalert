@@ -17,6 +17,9 @@ func (e *Engine) Ingest(p TrackPoint) error {
 
 // IngestContext 摄入单点；ctx 在评估前检查。
 func (e *Engine) IngestContext(ctx context.Context, p TrackPoint) error {
+	if e.closed.Load() {
+		return ErrClosed
+	}
 	if err := ctx.Err(); err != nil {
 		return ErrCanceled
 	}

@@ -69,12 +69,12 @@ func (d *Detector) ClearObject(objectID string) {
 	}
 }
 
-// Clear 清空。
+// Clear 清空。保持 state 为非 nil 可写映射，避免 Clear 后 Observe
+// 对 nil map 写入引发 panic（如运维误在 Close 后点 Ingest）。
 func (d *Detector) Clear() {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-
-	d.state = nil
+	d.state = make(map[key]cell)
 }
 
 // Inside 查询缓存状态。
