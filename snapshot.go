@@ -16,7 +16,7 @@ func (e *Engine) Snapshot() Snapshot {
 		Fences: make([]FenceView, 0, len(e.fences)),
 		Tracks: e.listTracksLocked(),
 
-		Alerts: e.alerts,
+		Alerts: cloneAlerts(e.alerts),
 		Stats:  e.statsLocked(),
 	}
 	for _, f := range e.fences {

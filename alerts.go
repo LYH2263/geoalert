@@ -17,9 +17,15 @@ func (e *Engine) emitLocked(a Alert) {
 	}
 }
 
+// cloneAlerts 深拷贝告警切片。Alert 为纯值类型结构体，make+copy 即完整拷贝，
+// 返回独立底层数组，调用方修改不影响引擎内部队列。
 func cloneAlerts(src []Alert) []Alert {
-
-	return src
+	if src == nil {
+		return nil
+	}
+	dst := make([]Alert, len(src))
+	copy(dst, src)
+	return dst
 }
 
 // Alerts 返回告警队列的拷贝，调用方修改不影响内部。
@@ -27,7 +33,7 @@ func (e *Engine) Alerts() []Alert {
 	e.mu.RLock()
 	defer e.mu.RUnlock()
 
-	return e.alerts
+	return cloneAlerts(e.alerts)
 }
 
 // DrainAlerts 取出并清空告警队列（返回拷贝）。
