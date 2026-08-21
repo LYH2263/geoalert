@@ -7,7 +7,7 @@ func wrapInvalidFence(err error) error {
 		return ErrInvalidFence
 	}
 
-	return fmt.Errorf("invalid fence: %v", err)
+	return fmt.Errorf("%w: %v", ErrInvalidFence, err)
 }
 
 func wrapPersist(err error) error {

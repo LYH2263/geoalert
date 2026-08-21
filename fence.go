@@ -29,8 +29,7 @@ func normalizeFence(f Fence) (Fence, error) {
 		}
 		pts := toGeom(verts)
 		if geom.SelfIntersects(pts) {
-
-			return Fence{}, validate.ErrSelfIntersect
+			return Fence{}, wrapInvalidFence(validate.ErrSelfIntersect)
 		}
 		out.Vertices = verts
 		out.Center = LatLng{}
