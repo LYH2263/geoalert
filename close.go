@@ -10,11 +10,13 @@ func (e *Engine) Close() error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
-	e.clearTracksLocked()
+	// 先记录关闭时刻的轨迹数并 Flush 告警日志，再清轨迹；
+	// 否则 tracks 已被清空，engine-close 行恒为 0。
 	if e.alertLog != nil {
 		_ = e.alertLog.Write("engine-close", "tracks", fmt.Sprintf("%d", len(e.tracks)))
 		_ = e.alertLog.Flush()
 	}
+	e.clearTracksLocked()
 	if err := e.store.Flush(); err != nil {
 		return wrapPersist(err)
 	}
