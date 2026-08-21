@@ -110,9 +110,6 @@ func (e *Engine) RegisterFence(f Fence) error {
 		return wrapPersist(err)
 	}
 
-	if f.Kind == FencePolygon {
-		norm.Vertices = f.Vertices
-	}
 	e.fences[norm.ID] = norm
 	e.active[norm.ID] = true
 	e.metrics.IncFences(1)

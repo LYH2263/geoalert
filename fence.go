@@ -54,9 +54,15 @@ func normalizeFence(f Fence) (Fence, error) {
 	return out, nil
 }
 
+// cloneLatLngs 深拷贝顶点切片。LatLng 为纯值类型（仅两个 float64），
+// 故 make+copy 即等价于深拷贝；nil 入参返回 nil，避免把空值替换成空切片。
 func cloneLatLngs(src []LatLng) []LatLng {
-
-	return src
+	if src == nil {
+		return nil
+	}
+	dst := make([]LatLng, len(src))
+	copy(dst, src)
+	return dst
 }
 
 func toGeom(vs []LatLng) []geom.Point {
