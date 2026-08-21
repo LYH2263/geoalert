@@ -24,14 +24,13 @@ func (m *Memory) SetFail(v bool) { m.fail = v }
 func (m *Memory) SaveFence(r FenceRecord) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	cp := r
-	cp.Vertices = cloneVerts(r.Vertices)
-	cp.Tags = cloneStr(r.Tags)
-
-	m.fences[r.ID] = cp
 	if m.fail {
 		return errPersist
 	}
+	cp := r
+	cp.Vertices = cloneVerts(r.Vertices)
+	cp.Tags = cloneStr(r.Tags)
+	m.fences[r.ID] = cp
 	return nil
 }
 

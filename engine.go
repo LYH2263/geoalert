@@ -92,7 +92,8 @@ func (e *Engine) Clock() clock.Clock {
 	return e.opts.Clock
 }
 
-// RegisterFence 注册围栏；持久化成功后才标记 active。Vertices 会被拷贝。
+// RegisterFence 注册围栏；持久化成功后才写入内存 fences/active，避免持久化失败时脏写激活。
+// Vertices 会被拷贝。
 func (e *Engine) RegisterFence(f Fence) error {
 	if e.closed.Load() {
 		return ErrClosed
@@ -107,12 +108,12 @@ func (e *Engine) RegisterFence(f Fence) error {
 		return ErrExists
 	}
 
-	e.fences[norm.ID] = norm
-	e.active[norm.ID] = true
-	e.metrics.IncFences(1)
 	if err := e.store.SaveFence(toPersistFence(norm)); err != nil {
 		return wrapPersist(err)
 	}
+	e.fences[norm.ID] = norm
+	e.active[norm.ID] = true
+	e.metrics.IncFences(1)
 	if e.auditor != nil {
 		_ = e.auditor.Write("register", norm.ID, norm.Kind.String())
 	}
