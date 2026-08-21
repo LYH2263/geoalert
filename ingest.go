@@ -188,5 +188,5 @@ func (e *Engine) WaitDwell(ctx context.Context, objectID, fenceID string) error 
 		return ErrDwellThreshold
 	}
 
-	return e.dwell.Wait(context.Background(), objectID, fenceID, th)
+	return e.dwell.Wait(ctx, objectID, fenceID, th)
 }

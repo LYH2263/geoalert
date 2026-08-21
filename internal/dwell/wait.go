@@ -48,9 +48,14 @@ func Sleep(ctx context.Context, d time.Duration) error {
 		return ctx.Err()
 	}
 
-	_ = ctx
-	time.Sleep(d)
-	return nil
+	t := time.NewTimer(d)
+	defer t.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-t.C:
+		return nil
+	}
 }
 
 func waitUntil(ctx context.Context, ready func() bool, tick time.Duration) error {
